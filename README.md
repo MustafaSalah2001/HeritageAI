@@ -2,11 +2,7 @@
 
 **Ghurza** connects Palestinian *tatreez* (embroidery) artisans directly with customers. A customer can buy a ready-made piece, or start from an idea, explore a design with AI help, pick an artisan and follow the piece until it is delivered.
 
-🔗 **Live demo:** http://ghurza.runasp.net
 
-![Ghurza home page](docs/screenshots/home.jpg)
-
----
 
 ## Features
 
