@@ -495,3 +495,4 @@ appsettings.Local.json
 **/wwwroot/uploads/
 **/wwwroot/assets/
 **/wwwroot/index.html
+.env

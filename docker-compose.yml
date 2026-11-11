@@ -1,0 +1,44 @@
+services:
+
+  # ---------- قاعدة البيانات ----------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ghurza-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - "1434:1433"            # 1434 على جهازك، عشان ما يتعارض مع SQL Server 2019 المنصّب عندك
+    volumes:
+      - sqldata:/var/opt/mssql # البيانات بتضل حتى لو حذفت الـ container
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------- غُرزة API ----------
+  api:
+    build: .
+    container_name: ghurza-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy   # استنّى لحد ما قاعدة البيانات تجهز
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=HeritageAI_Db;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: GHURZZA.Api
+      Jwt__Audience: GHURZZA.Client
+      Ai__Mode: Mock
+      Seed__AdminPassword: ${SEED_ADMIN_PASSWORD}
+      Seed__DemoPassword: ${SEED_DEMO_PASSWORD}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/wwwroot/uploads # الصور المرفوعة بتضل
+
+volumes:
+  sqldata:
+  uploads:
